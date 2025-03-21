@@ -1,0 +1,48 @@
+{
+    "manifest_version": 3,
+    "name": "Better Portal",
+    "version": "1.0",
+    "browser_specific_settings":{
+      "gecko":{
+        "id": "better-portal@addon.dev"
+      }
+    },
+    "description": "A browser extension to apply custom themes to the IITM assignments portal.",
+    "permissions": [
+        "storage",
+        "https://raw.githubusercontent.com/*"
+    ],
+    "host_permissions": [
+      "https://seek.onlinedegree.iitm.ac.in/courses/*",
+      "https://ds.study.iitm.ac.in/student_dashboard/*",
+      "https://app.onlinedegree.iitm.ac.in/student_dashboard/*"
+    ],
+    "background": {
+      "scripts": ["background.js"]
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    },
+    "content_scripts": [
+      {
+        "matches": [
+          "https://seek.onlinedegree.iitm.ac.in/courses/*",
+          "https://ds.study.iitm.ac.in/student_dashboard/*",
+          "https://app.onlinedegree.iitm.ac.in/student_dashboard/*"
+        ],
+        "js": ["content.js"],
+        "run_at": "document_idle"
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+            "themes/dark-theme/*.css",
+            "themes/purple-night/*.css"
+        ],
+        "matches": ["<all_urls>"],
+        "type": "stylesheet"
+      }
+    ]
+}

@@ -1,0 +1,99 @@
+body {
+    width: 300px;
+    background: #1E1E2E;
+    color: #CDD6F4;
+    font-family: "Inter", sans-serif;
+    text-align: center;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+/* Theme Switch Box */
+.switch-container {
+    display: flex;
+    align-items: center;
+    background: #313244;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%; /* Ensures full width */
+    box-sizing: border-box; /* Prevents overflow */
+    padding-right: 20px;
+    white-space: nowrap;
+}
+
+/* Individual Switch Styling */
+.switch {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 6px 12px; /* Adds padding for spacing */
+}
+
+
+/* Toggle Switch */
+.switch input {
+    display: none;
+}
+
+.slider {
+    width: 50px;
+    height: 24px;
+    background: #45475A;
+    border-radius: 20px;
+    position: relative;
+    transition: background 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 4px;
+    transition: transform 0.3s;
+}
+
+input:checked + .slider {
+    background: #A6E3A1;
+}
+
+input:checked + .slider::before {
+    transform: translateX(26px);
+}
+
+/* Button Styling */
+button {
+    background: #F38BA8;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #E64573;
+}
+
+* {
+    user-select: none;
+}

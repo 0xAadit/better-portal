@@ -1,0 +1,27 @@
+/* Hall Ticket, Exams, Documents */
+
+th, td, tr{
+    color: #fff;
+}
+
+
+.display.dataTable.no-footer{
+    background-color: #000 !important;
+}
+
+
+
+
+td.sorting_1, tr.odd,tr.even, .row{
+    background-color: #242424 !important;
+    color: #fff !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+.font-weight-400.text-dark{
+    color: #fff !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    filter: none !important;
+}

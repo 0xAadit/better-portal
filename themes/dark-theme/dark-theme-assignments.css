@@ -1,0 +1,103 @@
+/* Asiignment Section */
+
+/* General background and text fixes */
+body, 
+.modules__content-main, 
+.modules.content-head-title.ghost-loader{
+    background-color: #000 !important;
+    color: #242424 !important;
+}
+
+/* Fix invisible text */
+h1, h2, h3, h4, h5, h6, p, span, div, label, li, strong, b {
+    color: #ffffff !important;
+    background-color: transparent !important;
+}
+
+
+/* Fix buttons */
+button, 
+.btn, 
+.button-class {
+    background-color: #242424 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+}
+
+
+
+/* Fix input fields */
+input, 
+textarea, 
+select {
+    background-color: #2b2b2b !important;
+    color: #ffffff !important;
+    border: 1px solid #555555 !important;
+}
+
+
+
+/* Fix input fields*/
+input[type="radio"], 
+input[type="checkbox"] {
+    filter: brightness(1.5); /* Makes them more visible */
+}
+
+/* Fix other elements that may be transparent (nor really needed) */
+div, span, p {
+    opacity: 1 !important;
+}
+
+/* Improve link colors*/
+a {
+    color: #1e90ff !important;
+}
+
+a:hover {
+    color: #ffcc00 !important;
+}
+
+/* Retain context based color on submission */
+span.incorrect, .gcb-submission-due-date {
+    color: #FF4444 !important;
+}
+span.correct {
+    color: #34ff11 !important; 
+}
+h3.feedback-header.faculty-answer, .faculty-answer label, .faculty-answer {
+    color: #0f0 !important;
+}
+
+
+.submitted-icon.ng-star-inserted {
+    filter: invert(48%) sepia(68%) saturate(505%) hue-rotate(85deg) brightness(95%) contrast(90%) !important;
+}
+
+/* Work aruond for the nav bar */
+mat-sidenav, 
+.units__container__sidenav__option__selected, 
+.header.ng-tns-c25-0 {
+    background: linear-gradient(to bottom right, #222, #000);
+    background-attachment: fixed; /* Keeps gradient fixed when scrolling */
+    margin: 0;
+}
+
+.units__items.ng-star-inserted:not(:last-child) {
+    border-bottom: 2px solid #1a1a1a;
+}
+
+
+/* Add Layer to Question container */
+.gcb-cols.gcb-question-counter-increment.gcb-question-row, 
+.module-title-container,
+.mat-mdc-dialog-surface.mdc-dialog__surface{
+    color: #ffffff !important;
+    background-color: #242424 !important;
+    border-radius: 10px;
+    box-shadow: none !important;
+}
+
+/* Mobile Fixes */
+.menu-links.ng-tns-c25-0, .menu-box.ng-tns-c25-0.ng-trigger.ng-trigger-inOutAnimation.active.ng-star-inserted{
+    background-color: #242424 !important;
+}

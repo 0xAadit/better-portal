@@ -1,0 +1,50 @@
+/* Home Dashboard */
+
+/* Basic Background Set */
+body{
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+/* Fix invisible text */
+h1, h2, h3, h4, h5, h6, p, span, div, label, li, strong, b{
+    color: #ffffff !important;
+    background-color: transparent !important;
+}
+
+input, 
+textarea, 
+select {
+    background-color: #2b2b2b !important;
+    color: #ffffff !important;
+    border: 1px solid #555555 !important;
+}
+
+/* Fix buttons */
+button, 
+.btn, 
+.button-class {
+    background-color: #242424 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+}
+
+/* Fix other elements that may be transparent (nor really needed) */
+
+
+/* Containers */
+.nav-link.mb-sm-3.mb-md-0.active{
+    background-color: #626262 !important
+    
+}
+
+.nav-link.mb-sm-3.mb-md-0, .bg-primary, .row.mt-3.py-3{
+    background-color: #242424 !important;
+    color: #fff;
+}
+
+
+/* Top Bar */
+.navbar.navbar-expand-lg.navbar-light.bg-light.p-3{
+    background-color: #000 !important;  
+}
