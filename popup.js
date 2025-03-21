@@ -2,13 +2,16 @@
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 // Repository information - for fetching theme files
-const REPO_OWNER = 'YOUR_USERNAME';
-const REPO_NAME = 'REPO';
+const REPO_OWNER = '0xAadit';
+const REPO_NAME = 'better-portal';
 const BRANCH = 'main';
 
 // Define the base themes directory and required files for each theme
 const THEMES_BASE_PATH = 'themes';
 const REQUIRED_THEME_FILES = ['home', 'assignments', 'extras'];
+
+// Global variable to store theme configurations
+let THEMES_CONFIG = {};
 
 /**
  * Fetches the list of themes from GitHub
@@ -217,22 +220,106 @@ async function fetchAllThemes() {
 }
 
 /**
+ * Creates the toggle switches for each theme
+ * @param {Object} themesConfig The theme configuration object
+ */
+function createThemeToggles(themesConfig) {
+    const togglesContainer = document.getElementById('theme-toggles');
+    togglesContainer.innerHTML = ''; // Clear any existing toggles
+    
+    // First, add the default theme option
+    const defaultToggleDiv = document.createElement('div');
+    defaultToggleDiv.className = 'switch-container';
+    defaultToggleDiv.innerHTML = `
+        <label class="switch">
+            <span>Default Theme</span>
+            <input type="checkbox" id="default-theme-toggle">
+            <span class="slider"></span>
+        </label>
+    `;
+    togglesContainer.appendChild(defaultToggleDiv);
+    
+    // Then add a toggle for each theme
+    Object.entries(themesConfig).forEach(([themeId, themeConfig]) => {
+        const toggleDiv = document.createElement('div');
+        toggleDiv.className = 'switch-container';
+        toggleDiv.innerHTML = `
+            <label class="switch">
+                <span>${themeConfig.name}</span>
+                <input type="checkbox" id="${themeId}-toggle">
+                <span class="slider"></span>
+            </label>
+        `;
+        togglesContainer.appendChild(toggleDiv);
+    });
+    
+    // Setup event listeners for all toggles
+    setupToggleListeners(Object.keys(themesConfig));
+}
+
+/**
+ * Sets up event listeners for theme toggles
+ * @param {Array} themeIds List of theme IDs
+ */
+function setupToggleListeners(themeIds) {
+    // Get all toggle inputs
+    const toggles = {};
+    toggles['default'] = document.getElementById('default-theme-toggle');
+    
+    themeIds.forEach(themeId => {
+        toggles[themeId] = document.getElementById(`${themeId}-toggle`);
+    });
+    
+    // Get the current theme
+    browserAPI.storage.local.get('theme', (data) => {
+        const currentTheme = data.theme || 'default';
+        
+        // Set the correct toggle to checked
+        if (currentTheme === 'default') {
+            toggles['default'].checked = true;
+        } else if (toggles[currentTheme]) {
+            toggles[currentTheme].checked = true;
+        }
+    });
+    
+    // Add click handlers to all toggles
+    Object.entries(toggles).forEach(([themeId, toggle]) => {
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Uncheck all other toggles
+                Object.entries(toggles).forEach(([id, t]) => {
+                    if (id !== themeId) {
+                        t.checked = false;
+                    }
+                });
+                
+                // Save the theme selection
+                const selectedTheme = themeId === 'default' ? 'default' : themeId;
+                browserAPI.storage.local.set({ theme: selectedTheme });
+            } else {
+                // If unchecking and no other is checked, default to 'default'
+                const anyChecked = Object.values(toggles).some(t => t.checked);
+                if (!anyChecked) {
+                    toggles['default'].checked = true;
+                    browserAPI.storage.local.set({ theme: 'default' });
+                }
+            }
+        });
+    });
+}
+
+/**
  * Setup the UI when the popup opens
  */
 document.addEventListener('DOMContentLoaded', async function() {
-    // Get references to the UI elements
-    const darkThemeToggle = document.getElementById('dark-theme-toggle');
-    const purpleNightsToggle = document.getElementById('purple-nights-toggle');
     const refetchButton = document.getElementById('refetch');
     
     try {
-        // Load current theme setting and update toggles
-        const data = await browserAPI.storage.local.get('theme');
-        const currentTheme = data.theme || 'default';
+        // First, fetch the themes configuration
+        THEMES_CONFIG = await fetchThemesList();
         
-        // Set toggle states based on current theme
-        darkThemeToggle.checked = currentTheme === 'dark-theme';
-        purpleNightsToggle.checked = currentTheme === 'purple-nights';
+        // Create the theme toggles
+        createThemeToggles(THEMES_CONFIG);
         
         // Get last update time, if available
         const updateData = await browserAPI.storage.local.get('last_themes_update');
@@ -255,30 +342,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (error) {
         console.error('Error loading theme state:', error);
     }
-    
-    // Handle the dark theme toggle
-    darkThemeToggle.addEventListener('change', function() {
-        if (this.checked) {
-            // If enabling this theme, disable other themes
-            purpleNightsToggle.checked = false;
-            browserAPI.storage.local.set({ theme: 'dark-theme' });
-        } else if (!purpleNightsToggle.checked) {
-            // If turning off and no other theme is on, set default
-            browserAPI.storage.local.set({ theme: 'default' });
-        }
-    });
-    
-    // Handle the purple nights toggle
-    purpleNightsToggle.addEventListener('change', function() {
-        if (this.checked) {
-            // If enabling this theme, disable other themes
-            darkThemeToggle.checked = false;
-            browserAPI.storage.local.set({ theme: 'purple-nights' });
-        } else if (!darkThemeToggle.checked) {
-            // If turning off and no other theme is on, set default
-            browserAPI.storage.local.set({ theme: 'default' });
-        }
-    });
     
     // Setup the refetch button
     refetchButton.addEventListener('click', fetchAllThemes);

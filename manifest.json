@@ -9,13 +9,13 @@
     },
     "description": "A browser extension to apply custom themes to the IITM assignments portal.",
     "permissions": [
-        "storage",
-        "https://raw.githubusercontent.com/*"
+        "storage"
     ],
     "host_permissions": [
       "https://seek.onlinedegree.iitm.ac.in/courses/*",
       "https://ds.study.iitm.ac.in/student_dashboard/*",
-      "https://app.onlinedegree.iitm.ac.in/student_dashboard/*"
+      "https://app.onlinedegree.iitm.ac.in/student_dashboard/*",
+      "https://raw.githubusercontent.com/*"
     ],
     "background": {
       "scripts": ["background.js"]
@@ -41,8 +41,7 @@
             "themes/dark-theme/*.css",
             "themes/purple-night/*.css"
         ],
-        "matches": ["<all_urls>"],
-        "type": "stylesheet"
+        "matches": ["<all_urls>"]
       }
     ]
 }
