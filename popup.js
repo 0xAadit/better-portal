@@ -424,18 +424,15 @@ async function createThemeList(themesConfig) {
             });
             
             const downloadImg = createElement('img', {
-                src: 'icons/download.png',
-                alt: 'Download',
-                width: '14',
-                height: '14'
+                src: 'icons/download.svg',
+                alt: 'Download'
             });
             downloadBtn.appendChild(downloadImg);
             
             // Setup download button click handler
             downloadBtn.addEventListener('click', async function() {
                 this.classList.add('loading');
-                // Remove the spinner text and keep the icon
-                // this.textContent = '⟳'; 
+                this.textContent = '⟳';
                 this.disabled = true;
                 
                 const success = await downloadTheme(themeId);
@@ -494,7 +491,16 @@ async function createThemeList(themesConfig) {
                     // Reset download button
                     this.classList.remove('loading');
                     
-                    // No need to clear and recreate, just keep the original icon
+                    // Clear text and add download icon
+                    while (this.firstChild) {
+                        this.removeChild(this.firstChild);
+                    }
+                    const newImg = createElement('img', {
+                        src: 'icons/download.svg',
+                        alt: 'Download'
+                    });
+                    this.appendChild(newImg);
+                    
                     this.disabled = false;
                 }
             });
@@ -509,7 +515,7 @@ async function createThemeList(themesConfig) {
 }
 
 /**
- * Easter egg: All this was done by vibe coding lolll (But i had fun)
+ * Cleans up unused themes to save storage space
  * Keeps only the active theme and a few recently used ones
  */
 async function cleanupUnusedThemes() {

@@ -70,15 +70,13 @@ h2 {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.2s;
     padding: 0;
 }
 
 .download-btn img {
     width: 14px;
     height: 14px;
-    transition: opacity 0.3s ease;
-    object-fit: contain;
 }
 
 .download-btn:hover {
@@ -86,13 +84,13 @@ h2 {
 }
 
 .download-btn.loading {
-    background: #6C7086;
-    opacity: 0.8;
+    animation: spin 1s linear infinite;
     pointer-events: none;
 }
 
-.download-btn.loading img {
-    opacity: 0.5;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Individual Switch Styling */
@@ -170,29 +168,4 @@ button:hover {
     display: flex;
     flex-direction: column;
     gap: 8px; /* Space between theme options */
-}
-
-/* Refetch Button Styling */
-#refetch {
-    background: #89B4FA;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.3s;
-    margin: 15px auto 5px auto;
-    width: 90%;
-    box-sizing: border-box;
-}
-
-#refetch:hover {
-    background: #74C7EC;
-}
-
-#refetch:disabled {
-    background: #45475A;
-    cursor: default;
 }
