@@ -107,12 +107,14 @@ async function isThemeDownloaded(themeId) {
 
 /**
  * Builds a GitHub raw content URL for a theme file
- * @param {string} themePath Path to the theme folder
- * @param {string} fileName Name of the CSS file
+ * @param {string} themeName Name of the theme
+ * @param {string} fileType Type of file (home, assignments, extras)
  * @returns {string} The complete GitHub raw URL
  */
-function buildGitHubUrl(themePath, fileName) {
-    return `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${themePath}/${fileName}`;
+function buildGitHubUrl(themeName, fileType) {
+    // Match the exact file naming pattern in the repository
+    const fileName = `${themeName}-theme-${fileType}.css`;
+    return `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/themes/${themeName}/${fileName}`;
 }
 
 /**
@@ -131,9 +133,11 @@ async function downloadTheme(themeId) {
         const downloadPromises = [];
         
         // Download each required file for this theme
-        for (const [pageType, fileName] of Object.entries(themeConfig.files)) {
-            const url = buildGitHubUrl(themeConfig.path, fileName);
-            const storageKey = `${themeId}-${pageType}`;
+        for (const fileType of REQUIRED_THEME_FILES) {
+            const url = buildGitHubUrl(themeId, fileType);
+            const storageKey = `${themeId}-${fileType}`;
+            
+            console.log(`Downloading ${url} for ${storageKey}`);
             
             const downloadPromise = fetch(url, {
                 method: 'GET',
@@ -141,7 +145,7 @@ async function downloadTheme(themeId) {
                 headers: { 'Accept': 'text/css,*/*' }
             }).then(async response => {
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch ${url}`);
+                    throw new Error(`Failed to fetch ${url}: ${response.status}`);
                 }
                 
                 const cssContent = await response.text();
@@ -218,23 +222,60 @@ function setupThemeToggle(themeId) {
     toggle.addEventListener('change', function() {
         if (this.checked) {
             // Uncheck all other toggles including default
-            document.getElementById('default-theme-toggle').checked = false;
+            const defaultToggle = document.getElementById('default-theme-toggle');
+            if (defaultToggle) defaultToggle.checked = false;
             
-            for (const otherId of DOWNLOADED_THEMES) {
-                if (otherId !== themeId) {
-                    const otherToggle = document.getElementById(`${otherId}-toggle`);
-                    if (otherToggle) otherToggle.checked = false;
+            // Uncheck all other theme toggles
+            document.querySelectorAll('input[type="checkbox"][id$="-toggle"]').forEach(otherToggle => {
+                if (otherToggle.id !== `${themeId}-toggle`) {
+                    otherToggle.checked = false;
                 }
-            }
+            });
             
             // Apply this theme
             browserAPI.storage.local.set({ theme: themeId });
         } else {
             // If this was unchecked, default to the default theme
-            document.getElementById('default-theme-toggle').checked = true;
-            browserAPI.storage.local.set({ theme: 'default' });
+            const defaultToggle = document.getElementById('default-theme-toggle');
+            if (defaultToggle) {
+                defaultToggle.checked = true;
+                browserAPI.storage.local.set({ theme: 'default' });
+            }
         }
     });
+}
+
+/**
+ * Creates an HTML element with specified properties
+ * @param {string} tagName The HTML element tag name
+ * @param {Object} attributes Attributes to set on the element
+ * @param {Array} children Child elements to append
+ * @returns {HTMLElement} The created element
+ */
+function createElement(tagName, attributes = {}, children = []) {
+    const element = document.createElement(tagName);
+    
+    // Set attributes
+    for (const [key, value] of Object.entries(attributes)) {
+        if (key === 'textContent') {
+            element.textContent = value;
+        } else if (key === 'className') {
+            element.className = value;
+        } else {
+            element.setAttribute(key, value);
+        }
+    }
+    
+    // Append children
+    for (const child of children) {
+        if (typeof child === 'string') {
+            element.appendChild(document.createTextNode(child));
+        } else if (child instanceof Node) {
+            element.appendChild(child);
+        }
+    }
+    
+    return element;
 }
 
 /**
@@ -243,36 +284,66 @@ function setupThemeToggle(themeId) {
  */
 async function createThemeList(themesConfig) {
     const togglesContainer = document.getElementById('theme-toggles');
-    togglesContainer.innerHTML = ''; // Clear any existing toggles
+    // Clear container
+    while (togglesContainer.firstChild) {
+        togglesContainer.removeChild(togglesContainer.firstChild);
+    }
+    
+    // Get the currently active theme
+    const { theme: currentTheme } = await browserAPI.storage.local.get('theme');
+    const activeTheme = currentTheme || 'default';
     
     // First, add the default theme option (always available)
-    const defaultToggleDiv = document.createElement('div');
-    defaultToggleDiv.className = 'switch-container';
-    defaultToggleDiv.innerHTML = `
-        <div class="theme-item">
-            <span>Default Theme</span>
-            <div class="theme-status">
-                <input type="checkbox" id="default-theme-toggle" style="display:none;">
-                <span class="slider" id="default-theme-slider"></span>
-            </div>
-        </div>
-    `;
+    const defaultToggleDiv = createElement('div', { className: 'switch-container' });
+    const defaultThemeItem = createElement('div', { className: 'theme-item' });
+    
+    // Add theme name
+    const defaultThemeSpan = createElement('span', { textContent: 'Default Theme' });
+    defaultThemeItem.appendChild(defaultThemeSpan);
+    
+    // Add theme status
+    const defaultThemeStatus = createElement('div', { className: 'theme-status' });
+    
+    // Add toggle input
+    const defaultToggleInput = createElement('input', { 
+        type: 'checkbox', 
+        id: 'default-theme-toggle', 
+        style: 'display:none;' 
+    });
+    
+    // Set initial state
+    if (activeTheme === 'default') {
+        defaultToggleInput.checked = true;
+    }
+    
+    defaultThemeStatus.appendChild(defaultToggleInput);
+    
+    // Add slider
+    const defaultSlider = createElement('span', { 
+        className: 'slider', 
+        id: 'default-theme-slider' 
+    });
+    defaultThemeStatus.appendChild(defaultSlider);
+    
+    defaultThemeItem.appendChild(defaultThemeStatus);
+    defaultToggleDiv.appendChild(defaultThemeItem);
     togglesContainer.appendChild(defaultToggleDiv);
     
     // Make the default theme slider clickable
-    const defaultSlider = document.getElementById('default-theme-slider');
     defaultSlider.addEventListener('click', function() {
-        const defaultToggle = document.getElementById('default-theme-toggle');
-        defaultToggle.checked = true;
-        
-        // Uncheck all other theme toggles
-        for (const themeId of DOWNLOADED_THEMES) {
-            const toggle = document.getElementById(`${themeId}-toggle`);
-            if (toggle) toggle.checked = false;
+        // Only do something if default is not already selected
+        if (!defaultToggleInput.checked) {
+            // Uncheck all other theme toggles
+            document.querySelectorAll('input[type="checkbox"][id$="-toggle"]').forEach(toggle => {
+                toggle.checked = false;
+            });
+            
+            // Check the default toggle
+            defaultToggleInput.checked = true;
+            
+            // Set default theme
+            browserAPI.storage.local.set({ theme: 'default' });
         }
-        
-        // Set default theme
-        browserAPI.storage.local.set({ theme: 'default' });
     });
     
     // Check which themes are already downloaded
@@ -295,103 +366,151 @@ async function createThemeList(themesConfig) {
     for (const [themeId, themeConfig] of Object.entries(themesConfig)) {
         const isDownloaded = DOWNLOADED_THEMES.has(themeId);
         
-        const themeDiv = document.createElement('div');
-        themeDiv.className = 'switch-container';
-        themeDiv.innerHTML = `
-            <div class="theme-item">
-                <span>${themeConfig.name}</span>
-                <div class="theme-status">
-                    ${isDownloaded 
-                        ? `<input type="checkbox" id="${themeId}-toggle" style="display:none;">
-                           <span class="slider" id="${themeId}-slider"></span>` 
-                        : `<button class="download-btn" id="${themeId}-download"><img src="icons/download.svg" alt="Download"></button>`
-                    }
-                </div>
-            </div>
-        `;
-        togglesContainer.appendChild(themeDiv);
+        // Create theme container
+        const themeDiv = createElement('div', { className: 'switch-container' });
+        const themeItem = createElement('div', { className: 'theme-item' });
         
-        // Add download button click handler
-        if (!isDownloaded) {
-            const downloadBtn = document.getElementById(`${themeId}-download`);
+        // Add theme name
+        const themeSpan = createElement('span', { textContent: themeConfig.name });
+        themeItem.appendChild(themeSpan);
+        
+        // Add theme status
+        const themeStatus = createElement('div', { className: 'theme-status' });
+        
+        if (isDownloaded) {
+            // Add toggle for downloaded theme
+            const toggleInput = createElement('input', {
+                type: 'checkbox',
+                id: `${themeId}-toggle`,
+                style: 'display:none;'
+            });
+            
+            // Set initial state
+            if (activeTheme === themeId) {
+                toggleInput.checked = true;
+            }
+            
+            themeStatus.appendChild(toggleInput);
+            
+            const slider = createElement('span', {
+                className: 'slider',
+                id: `${themeId}-slider`
+            });
+            themeStatus.appendChild(slider);
+            
+            // Setup slider click handler
+            slider.addEventListener('click', function() {
+                const themeToggle = document.getElementById(`${themeId}-toggle`);
+                
+                // Only do something if this toggle is not already checked
+                if (!themeToggle.checked) {
+                    // Uncheck all toggles
+                    document.querySelectorAll('input[type="checkbox"][id$="-toggle"]').forEach(toggle => {
+                        toggle.checked = false;
+                    });
+                    
+                    // Check this toggle
+                    themeToggle.checked = true;
+                    
+                    // Apply this theme
+                    browserAPI.storage.local.set({ theme: themeId });
+                }
+            });
+        } else {
+            // Add download button for non-downloaded theme
+            const downloadBtn = createElement('button', {
+                className: 'download-btn',
+                id: `${themeId}-download`
+            });
+            
+            const downloadImg = createElement('img', {
+                src: 'icons/download.svg',
+                alt: 'Download'
+            });
+            downloadBtn.appendChild(downloadImg);
+            
+            // Setup download button click handler
             downloadBtn.addEventListener('click', async function() {
                 this.classList.add('loading');
-                this.innerHTML = '⟳';
+                this.textContent = '⟳';
                 this.disabled = true;
                 
                 const success = await downloadTheme(themeId);
                 
                 if (success) {
-                    // Replace download button with toggle switch
-                    const themeStatus = this.parentElement;
-                    themeStatus.innerHTML = `
-                        <input type="checkbox" id="${themeId}-toggle" style="display:none;">
-                        <span class="slider" id="${themeId}-slider"></span>
-                    `;
+                    // Remove download button
+                    themeStatus.removeChild(downloadBtn);
                     
-                    // Make the slider clickable
-                    const themeSlider = document.getElementById(`${themeId}-slider`);
-                    themeSlider.addEventListener('click', function() {
+                    // Create toggle input and slider
+                    const toggleInput = createElement('input', {
+                        type: 'checkbox',
+                        id: `${themeId}-toggle`,
+                        style: 'display:none;'
+                    });
+                    themeStatus.appendChild(toggleInput);
+                    
+                    const slider = createElement('span', {
+                        className: 'slider',
+                        id: `${themeId}-slider`
+                    });
+                    themeStatus.appendChild(slider);
+                    
+                    // Setup slider click handler
+                    slider.addEventListener('click', function() {
                         const themeToggle = document.getElementById(`${themeId}-toggle`);
-                        const wasChecked = themeToggle.checked;
                         
-                        // Toggle the checkbox state
-                        themeToggle.checked = !wasChecked;
-                        
-                        // Dispatch change event to trigger the change handler
-                        const event = new Event('change');
-                        themeToggle.dispatchEvent(event);
+                        // Only do something if this toggle is not already checked
+                        if (!themeToggle.checked) {
+                            // Uncheck all toggles
+                            document.querySelectorAll('input[type="checkbox"][id$="-toggle"]').forEach(toggle => {
+                                toggle.checked = false;
+                            });
+                            
+                            // Check this toggle
+                            themeToggle.checked = true;
+                            
+                            // Apply this theme
+                            browserAPI.storage.local.set({ theme: themeId });
+                        }
+                    });
+
+                    // Uncheck all toggles
+                    document.querySelectorAll('input[type="checkbox"][id$="-toggle"]').forEach(toggle => {
+                        toggle.checked = false;
                     });
                     
-                    // Setup the toggle event listener
-                    setupThemeToggle(themeId);
-
                     // Check the newly downloaded theme toggle
                     const toggle = document.getElementById(`${themeId}-toggle`);
                     if (toggle) {
                         toggle.checked = true;
-                        // Also trigger the change event to ensure the theme is applied
-                        const event = new Event('change');
-                        toggle.dispatchEvent(event);
+                        
+                        // Apply this theme
+                        browserAPI.storage.local.set({ theme: themeId });
                     }
                 } else {
                     // Reset download button
                     this.classList.remove('loading');
-                    this.innerHTML = '<img src="icons/download.svg" alt="Download">';
+                    
+                    // Clear text and add download icon
+                    while (this.firstChild) {
+                        this.removeChild(this.firstChild);
+                    }
+                    const newImg = createElement('img', {
+                        src: 'icons/download.svg',
+                        alt: 'Download'
+                    });
+                    this.appendChild(newImg);
+                    
                     this.disabled = false;
                 }
             });
-        } else {
-            // Make the slider clickable
-            const themeSlider = document.getElementById(`${themeId}-slider`);
-            themeSlider.addEventListener('click', function() {
-                const themeToggle = document.getElementById(`${themeId}-toggle`);
-                const wasChecked = themeToggle.checked;
-                
-                // Toggle the checkbox state
-                themeToggle.checked = !wasChecked;
-                
-                // Dispatch change event to trigger the change handler
-                const event = new Event('change');
-                themeToggle.dispatchEvent(event);
-            });
             
-            // Setup toggle for downloaded theme
-            setupThemeToggle(themeId);
+            themeStatus.appendChild(downloadBtn);
         }
-    }
-    
-    // Check the currently active theme
-    const { theme } = await browserAPI.storage.local.get('theme');
-    if (theme === 'default' || !theme) {
-        document.getElementById('default-theme-toggle').checked = true;
-    } else if (DOWNLOADED_THEMES.has(theme)) {
-        const toggle = document.getElementById(`${theme}-toggle`);
-        if (toggle) toggle.checked = true;
-    } else {
-        // If the current theme isn't downloaded or default, switch to default
-        document.getElementById('default-theme-toggle').checked = true;
-        browserAPI.storage.local.set({ theme: 'default' });
+        
+        themeItem.appendChild(themeStatus);
+        themeDiv.appendChild(themeItem);
+        togglesContainer.appendChild(themeDiv);
     }
 }
 
@@ -468,13 +587,12 @@ document.addEventListener('DOMContentLoaded', async function() {
             const daysSinceUpdate = Math.floor((now - lastUpdate) / (1000 * 60 * 60 * 24));
             
             // Add a "last updated" note
-            const infoText = document.createElement('div');
-            infoText.style.fontSize = '11px';
-            infoText.style.opacity = '0.7';
-            infoText.style.marginTop = '10px';
-            infoText.textContent = daysSinceUpdate === 0 
+            const infoText = createElement('div', {
+                textContent: daysSinceUpdate === 0 
                 ? 'Themes updated today' 
-                : `Themes updated ${daysSinceUpdate} day${daysSinceUpdate !== 1 ? 's' : ''} ago`;
+                    : `Themes updated ${daysSinceUpdate} day${daysSinceUpdate !== 1 ? 's' : ''} ago`,
+                style: 'font-size: 11px; opacity: 0.7; margin-top: 10px;'
+            });
             
             refetchButton.parentNode.appendChild(infoText);
         }
