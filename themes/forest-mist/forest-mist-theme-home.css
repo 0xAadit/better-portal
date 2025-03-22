@@ -2,7 +2,7 @@
 
 /* Basic Background Set */
 body{
-    background-color: #1d1d2d !important;
+    background-color: #023337 !important;
     color: #fff !important;
 }
 
@@ -15,7 +15,7 @@ h1, h2, h3, h4, h5, h6, p, span, div, label, li, strong, b{
 input, 
 textarea, 
 select {
-    background-color: #2b2b2b !important;
+    background-color:  #2b5b5b !important;
     color: #ffffff !important;
     border: 1px solid #555555 !important;
 }
@@ -24,7 +24,7 @@ select {
 button, 
 .btn, 
 .button-class {
-    background-color: #2e2f3d !important;
+    background-color: #2b5b5b !important;
     color: #ffffff !important;
     border: 1px solid #ffffff !important;
 }
@@ -34,7 +34,7 @@ button,
 
 /* Containers */
 .nav-link.mb-sm-3.mb-md-0.active{
-    background-color: #87889c !important
+    background-color: #c0e5b9 !important
     
 }
 
@@ -46,5 +46,5 @@ button,
 
 /* Top Bar */
 .navbar.navbar-expand-lg.navbar-light.bg-light.p-3{
-    background-color: #1d1d2d !important;  
+    background-color: #023337 !important;  
 }

@@ -4,8 +4,8 @@
 body, 
 .modules__content-main, 
 .modules.content-head-title.ghost-loader{
-    background-color: #1d1d2d !important;
-    color: #242424 !important;
+    background-color: #023337 !important;
+    color: #ffffff !important;
 }
 
 /* Fix invisible text */
@@ -19,7 +19,7 @@ h1, h2, h3, h4, h5, h6, p, span, div, label, li, strong, b {
 button, 
 .btn, 
 .button-class {
-    background-color: #242424 !important;
+    background-color: #2b5b5b !important;
     color: #ffffff !important;
     border: 1px solid #ffffff !important;
 }
@@ -30,7 +30,7 @@ button,
 input, 
 textarea, 
 select {
-    background-color: #2b2b2b !important;
+    background-color: #1f4040 !important;
     color: #ffffff !important;
     border: 1px solid #555555 !important;
 }
@@ -50,11 +50,11 @@ div, span, p {
 
 /* Improve link colors*/
 a {
-    color: #b89bd7 !important;
+    color: #1f4040 !important;
 }
 
 a:hover {
-    color: #ffcc00 !important;
+    color: #008961 !important;
 }
 
 /* Retain context based color on submission */
@@ -92,12 +92,12 @@ mat-sidenav,
 .module-title-container,
 .mat-mdc-dialog-surface.mdc-dialog__surface{
     color: #ffffff !important;
-    background-color: #2e2f3d !important;
+    background-color: #2b5b5b !important;
     border-radius: 10px;
     box-shadow: none !important;
 }
 
 /* Mobile Fixes */
 .menu-links.ng-tns-c25-0, .menu-box.ng-tns-c25-0.ng-trigger.ng-trigger-inOutAnimation.active.ng-star-inserted{
-    background-color: #242424 !important;
+    background-color: #2b5b5b !important;
 }

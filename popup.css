@@ -24,14 +24,73 @@ h2 {
     display: flex;
     align-items: center;
     background: #313244;
-    padding: 12px;
+    padding: 12px 16px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
-    width: 100%; /* Ensures full width */
-    box-sizing: border-box; /* Prevents overflow */
-    padding-right: 20px;
-    white-space: nowrap;
+    width: 90%;
+    box-sizing: border-box;
+    margin: 0 auto 10px auto;
+    position: relative;
+    height: 46px;
+}
+
+/* Theme item styling */
+.theme-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.theme-item span {
+    text-align: left;
+    flex: 1;
+}
+
+/* Theme status indicators */
+.theme-status {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    width: 46px;
+    height: 22px;
+}
+
+/* Download button */
+.download-btn {
+    background: #89B4FA;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    width: 46px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    padding: 0;
+}
+
+.download-btn img {
+    width: 14px;
+    height: 14px;
+}
+
+.download-btn:hover {
+    background: #74C7EC;
+}
+
+.download-btn.loading {
+    animation: spin 1s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Individual Switch Styling */
@@ -39,9 +98,13 @@ h2 {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 6px 12px; /* Adds padding for spacing */
+    position: relative;
 }
 
+.switch span {
+    flex: 1;
+    text-align: left;
+}
 
 /* Toggle Switch */
 .switch input {
@@ -49,23 +112,24 @@ h2 {
 }
 
 .slider {
-    width: 50px;
-    height: 24px;
+    width: 46px;
+    height: 22px;
     background: #45475A;
     border-radius: 20px;
-    position: relative;
+    position: absolute;
+    right: 0;
     transition: background 0.3s;
 }
 
 .slider::before {
     content: "";
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     background: white;
     border-radius: 50%;
     top: 3px;
-    left: 4px;
+    left: 3px;
     transition: transform 0.3s;
 }
 
@@ -74,7 +138,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider::before {
-    transform: translateX(26px);
+    transform: translateX(24px);
 }
 
 /* Button Styling */
@@ -88,6 +152,7 @@ button {
     font-size: 16px;
     font-weight: 600;
     transition: background 0.3s;
+    margin-top: 10px; /* Add space above button */
 }
 
 button:hover {
@@ -96,4 +161,11 @@ button:hover {
 
 * {
     user-select: none;
+}
+
+/* Theme toggles container spacing */
+#theme-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between theme options */
 }
